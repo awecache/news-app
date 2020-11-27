@@ -3,13 +3,19 @@
   <header>Countries</header>
   <button [routerLink]="['/settings']">Settings</button>
 </div>
-<ul class="list-group">
-  <li class="list-group-item" *ngFor="let country of countries">
-    {{ country.countryName }}
-    <img
-      src="{{ country.flagUrl }}"
-      alt=""
-      class="img-thumbnail rounded float-right"
-    />
-  </li>
-</ul>
+<ng-container *ngIf="countries?.length">
+  <ul class="list-group">
+    <li
+      class="list-group-item"
+      *ngFor="let country of countries"
+      (click)="navigateToNews(country.countryId)"
+    >
+      {{ country.countryName }}
+      <img
+        src="{{ country.flagUrl }}"
+        alt=""
+        class="img-thumbnail rounded float-right"
+      />
+    </li>
+  </ul>
+</ng-container>

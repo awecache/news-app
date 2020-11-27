@@ -42,6 +42,7 @@ export class CountryListComponent implements OnInit {
           this.apis.fetchCountries().then((countries) =>
             countries.map((country) => {
               const formattedCountry: Country = {
+                countryId: (country.alpha2Code as string).toLowerCase(),
                 countryName: country.name,
                 flagUrl: country.flag,
               };
@@ -51,7 +52,9 @@ export class CountryListComponent implements OnInit {
           );
         }
       });
+  }
 
-    //
+  navigateToNews(countryCode: string) {
+    this.router.navigate(['/news', countryCode]);
   }
 }

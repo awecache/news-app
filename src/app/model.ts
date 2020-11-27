@@ -1,5 +1,5 @@
 export interface Country {
-  countryId?: number;
+  countryId: string;
   countryName: string;
   flagUrl: string;
 }
@@ -17,4 +17,10 @@ export interface NewsArticle {
 
 export interface ApiKey {
   key: string;
+}
+
+export interface ArticlesByCountry {
+  countryCode: string;
+  cachedTimestamp: number;
+  articles: NewsArticle[];
 }

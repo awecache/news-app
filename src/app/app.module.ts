@@ -12,7 +12,7 @@ import { HttpClientModule } from '@angular/common/http';
 const routes: Routes = [
   { path: 'settings', component: SettingsComponent },
   { path: 'countries', component: CountryListComponent },
-  { path: 'news', component: NewsComponent },
+  { path: 'news/:countryCode', component: NewsComponent },
   { path: '**', redirectTo: 'countries', pathMatch: 'full' },
 ];
 @NgModule({
