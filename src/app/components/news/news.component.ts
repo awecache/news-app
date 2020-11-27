@@ -111,14 +111,13 @@ export class NewsComponent implements OnInit {
           this.articles = res?.articles || [];
         });
       });
-    console.log('arti', this.articles);
 
-    // this.appDB
-    //   .getSavedArticlesByCountry(this.countryCode)
-    //   .then((articlesByCountry) => {
-    //     if (articlesByCountry?.articles.length) {
-    //       this.articles = [...this.articles, ...articlesByCountry.articles];
-    //     }
-    //   });
+    this.appDB
+      .getSavedArticlesByCountry(this.countryCode)
+      .then((articlesByCountry) => {
+        if (articlesByCountry?.articles.length) {
+          this.articles = [...this.articles, ...articlesByCountry.articles];
+        }
+      });
   }
 }
