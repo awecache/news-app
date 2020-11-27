@@ -12,6 +12,7 @@ import { ArticlesByCountry, NewsArticle } from 'src/app/model';
 export class NewsComponent implements OnInit {
   countryCode?: string;
   articles: NewsArticle[] = [];
+  countryName?: string;
 
   constructor(
     private appDB: AppDatabaseService,
@@ -22,7 +23,6 @@ export class NewsComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe((param) => {
-      // console.log('cotr', param.countryCode);
       this.countryCode = param.countryCode;
     });
 
@@ -38,6 +38,11 @@ export class NewsComponent implements OnInit {
       }
     });
 
+    // this.countryName = this.ap;
+    this.appDB.getCountryByCode(this.countryCode).then((res) => {
+      this.countryName = res?.countryName ?? '';
+    });
+
     this.appDB
       .getNewsByCountryCode(this.countryCode)
       .then((articlesByCountry) => {
@@ -49,55 +54,71 @@ export class NewsComponent implements OnInit {
         const millis = Date.now() - (articlesByCountry?.cachedTimestamp || 0);
         const minLapsed = Math.floor(millis / 1000) / 60;
 
-        const isCacheExpired = minLapsed < 5;
+        const isCacheExpired = minLapsed > 5;
         if (!articlesByCountry || isCacheExpired) {
           if (articlesByCountry) {
             this.appDB.deleteCachedArticles(this.countryCode);
-            console.log('del');
           }
 
-          this.apis.fetchArticles(this.countryCode).then((res) => {
-            const articles: NewsArticle[] = res.articles.map((article: any) => {
-              const {
-                source,
-                author,
-                title,
-                description,
-                url,
-                urlToImage,
-                publishedAt,
-                content,
-              } = article;
+          this.apis
+            .fetchArticles(this.countryCode)
+            .then((res) => {
+              const articles: NewsArticle[] = res.articles.map(
+                (article: any) => {
+                  const {
+                    source,
+                    author,
+                    title,
+                    description,
+                    url,
+                    urlToImage,
+                    publishedAt,
+                    content,
+                  } = article;
 
-              return {
-                author,
-                title,
-                description,
-                content,
-                url,
-                sourceName: source.name as string,
-                imageUrl: urlToImage,
-                publishDateTime: publishedAt,
+                  return {
+                    author,
+                    title,
+                    description,
+                    content,
+                    url,
+                    sourceName: source.name as string,
+                    imageUrl: urlToImage,
+                    publishDateTime: publishedAt,
+                  };
+                }
+              );
+
+              const articlesByCountry = {
+                articles,
+                countryCode: this.countryCode || '',
+                cachedTimestamp: Date.now(),
               };
+
+              this.appDB.cacheArticlesByCountry(articlesByCountry);
+            })
+            .then(() => {
+              if (this.countryCode) {
+                this.appDB
+                  .getNewsByCountryCode(this.countryCode)
+                  .then((res) => {
+                    console.log(res);
+                  });
+              }
             });
-
-            const articlesByCountry = {
-              articles,
-              countryCode: this.countryCode || '',
-              cachedTimestamp: Date.now(),
-            };
-
-            this.appDB.cacheArticlesByCountry(articlesByCountry);
-          });
         }
+        this.appDB.getNewsByCountryCode(this.countryCode).then((res) => {
+          this.articles = res?.articles;
+        });
       });
+    console.log('arti', this.articles);
 
-    this.appDB
-      .getSavedArticlesByCountry(this.countryCode)
-      .then((articlesByCountry) => {
-        if (articlesByCountry?.articles.length) {
-          this.articles = [...this.articles, ...articlesByCountry.articles];
-        }
-      });
+    // this.appDB
+    //   .getSavedArticlesByCountry(this.countryCode)
+    //   .then((articlesByCountry) => {
+    //     if (articlesByCountry?.articles.length) {
+    //       this.articles = [...this.articles, ...articlesByCountry.articles];
+    //     }
+    //   });
   }
 }

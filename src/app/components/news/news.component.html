@@ -1,1 +1,16 @@
-<p>news works!</p>
+<div class="top">
+  <header>News from {{ countryName }}</header>
+  <button [routerLink]="['/countries']">Back</button>
+</div>
+<ng-container *ngIf="articles?.length">
+  <ul class="list-group">
+    <li class="list-group-item" *ngFor="let article of articles">
+      <img
+        src="{{ article.imageUrl }}"
+        alt=""
+        class="img-thumbnail rounded float-left"
+      />
+      {{ article }}
+    </li>
+  </ul>
+</ng-container>

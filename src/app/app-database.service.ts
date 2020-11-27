@@ -7,7 +7,7 @@ import { ApiKey, ArticlesByCountry, Country, NewsArticle } from './model';
 })
 export class AppDatabaseService extends Dexie {
   private apiKey: Dexie.Table<ApiKey, number>;
-  private countryList: Dexie.Table<Country, number>;
+  private countryList: Dexie.Table<Country, string>;
   private news: Dexie.Table<ArticlesByCountry, string>;
   private savedNews: Dexie.Table<ArticlesByCountry, string>;
 
@@ -48,6 +48,11 @@ export class AppDatabaseService extends Dexie {
     return this.countryList.toArray();
   }
 
+  getCountryByCode(countryCode: string): Promise<Country | undefined> {
+    return this.countryList.get(countryCode);
+    // where('countryCode').equals(countryCode).toArray();
+  }
+
   saveCountry(country: Country) {
     this.countryList.add(country);
   }
@@ -71,4 +76,6 @@ export class AppDatabaseService extends Dexie {
   ): Promise<ArticlesByCountry | undefined> {
     return this.savedNews.get(countryCode);
   }
+
+  saveArticleByCountry(countryCode: string, article: NewsArticle) {}
 }
