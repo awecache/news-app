@@ -10,7 +10,12 @@
         alt=""
         class="img-thumbnail rounded float-left"
       />
-      {{ article }}
+      {{ article.author }}
+
+      {{ article.title }}
+      {{ article.content }}
+      {{ article.publishDateTime }}
+      <a href="{{ article.url }}"> {{ article.url }}</a>
     </li>
   </ul>
 </ng-container>

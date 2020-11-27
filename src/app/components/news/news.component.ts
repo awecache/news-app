@@ -108,7 +108,7 @@ export class NewsComponent implements OnInit {
             });
         }
         this.appDB.getNewsByCountryCode(this.countryCode).then((res) => {
-          this.articles = res?.articles;
+          this.articles = res?.articles || [];
         });
       });
     console.log('arti', this.articles);
