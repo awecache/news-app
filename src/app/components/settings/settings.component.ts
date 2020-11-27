@@ -42,6 +42,7 @@ export class SettingsComponent implements OnInit {
     const key = this.settingsForm.get('apiKey')?.value;
     if (key) {
       this.appDB.addKey({ key });
+      this.settingsForm.setValue({ apiKey: '' });
     }
   }
 }

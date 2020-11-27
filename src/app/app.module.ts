@@ -7,6 +7,7 @@ import { NewsComponent } from './components/news/news.component';
 import { CountryListComponent } from './components/country-list/country-list.component';
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 const routes: Routes = [
   { path: 'settings', component: SettingsComponent },
@@ -26,6 +27,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes),
     FormsModule,
     ReactiveFormsModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

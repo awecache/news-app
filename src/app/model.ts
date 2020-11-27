@@ -1,5 +1,5 @@
 export interface Country {
-  countryId: number;
+  countryId?: number;
   countryName: string;
   flagUrl: string;
 }

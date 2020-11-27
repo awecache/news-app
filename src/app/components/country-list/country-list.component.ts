@@ -1,6 +1,9 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ApisService } from 'src/app/apis.service';
 import { AppDatabaseService } from 'src/app/app-database.service';
+import { Country } from 'src/app/model';
 
 @Component({
   selector: 'app-country-list',
@@ -9,8 +12,13 @@ import { AppDatabaseService } from 'src/app/app-database.service';
 })
 export class CountryListComponent implements OnInit {
   apiKey?: string;
+  countries?: Country[];
 
-  constructor(private appDB: AppDatabaseService, private router: Router) {}
+  constructor(
+    private appDB: AppDatabaseService,
+    private router: Router,
+    private apis: ApisService
+  ) {}
 
   ngOnInit(): void {
     this.appDB
@@ -23,5 +31,27 @@ export class CountryListComponent implements OnInit {
           this.router.navigate(['/settings']);
         }
       });
+
+    this.appDB
+      .getCountires()
+      .then((countries) => {
+        this.countries = countries;
+      })
+      .then(() => {
+        if (!this.countries?.length) {
+          this.apis.fetchCountries().then((countries) =>
+            countries.map((country) => {
+              const formattedCountry: Country = {
+                countryName: country.name,
+                flagUrl: country.flag,
+              };
+
+              this.appDB.saveCountry(formattedCountry);
+            })
+          );
+        }
+      });
+
+    //
   }
 }
