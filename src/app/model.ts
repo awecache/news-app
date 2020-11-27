@@ -14,3 +14,7 @@ export interface NewsArticle {
   publishDateTime: string;
   content: string;
 }
+
+export interface ApiKey {
+  key: string;
+}
