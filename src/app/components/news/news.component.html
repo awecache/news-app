@@ -1,24 +1,46 @@
-<div class="top">
-  <header>News from {{ countryName }}</header>
-  <button [routerLink]="['/countries']">Back</button>
+<div class="top mt-3 mb-3">
+  <header>
+    <h2>News from {{ countryName }}</h2>
+  </header>
+  <button class="btn btn-secondary" type="button" [routerLink]="['/countries']">
+    Back
+  </button>
 </div>
 <ng-container *ngIf="articles?.length">
   <ul class="list-group">
     <li class="list-group-item" *ngFor="let article of articles">
-      <button type="button" (click)="saveArticle(article)">Save</button>
-      <img
-        src="{{ article.imageUrl }}"
-        alt=""
-        class="img-thumbnail rounded float-left"
-      />
-      <h3>
-        {{ article.title }}
-      </h3>
-      <h5>{{ article.author }}</h5>
-
-      {{ article.content }}
-      {{ article.publishDateTime }}
-      <a href="{{ article.url }}"> {{ article.url }}</a>
+      <div class="article-container">
+        <div class="image">
+          <img
+            src="{{ article.imageUrl }}"
+            alt="{{ article.title }}"
+            class="img-thumbnail rounded float-left"
+          />
+        </div>
+        <div class="content">
+          <div class="header">
+            <h4>
+              title
+              {{ article.title }}
+            </h4>
+            <button
+              class="btn btn-primary"
+              type="button"
+              (click)="saveArticle(article)"
+            >
+              Save
+            </button>
+          </div>
+          <h5>{{ article.author }}</h5>
+          <h5>
+            {{ article.publishDateTime }}
+          </h5>
+          <p>
+            {{ article.content }}
+          </p>
+          <a href="{{ article.url }}"> {{ article.url | shorten }} </a>
+        </div>
+      </div>
     </li>
   </ul>
 </ng-container>

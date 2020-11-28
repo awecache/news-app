@@ -8,6 +8,7 @@ import { CountryListComponent } from './components/country-list/country-list.com
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { ShortenPipe } from './components/news/shorten.pipe';
 
 const routes: Routes = [
   { path: 'settings', component: SettingsComponent },
@@ -21,6 +22,7 @@ const routes: Routes = [
     SettingsComponent,
     NewsComponent,
     CountryListComponent,
+    ShortenPipe,
   ],
   imports: [
     BrowserModule,

@@ -2,3 +2,22 @@
   display: flex;
   justify-content: space-between;
 }
+
+.article-container {
+  display: flex;
+  flex-direction: row;
+}
+
+img {
+  max-width: 35vw;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+}
+
+button {
+  width: 60px;
+  height: 40px;
+}

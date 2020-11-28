@@ -1,7 +1,10 @@
-<p>country-list works!</p>
-<div class="top">
-  <header>Countries</header>
-  <button [routerLink]="['/settings']">Settings</button>
+<div class="top mt-3 mb-3">
+  <header>
+    <h2>Countries</h2>
+  </header>
+  <button class="btn btn-secondary" type="button" [routerLink]="['/settings']">
+    Settings
+  </button>
 </div>
 <ng-container *ngIf="countries?.length">
   <ul class="list-group">
@@ -13,7 +16,7 @@
       {{ country.countryName }}
       <img
         src="{{ country.flagUrl }}"
-        alt=""
+        alt="{{ country.countryName }}"
         class="img-thumbnail rounded float-right"
       />
     </li>

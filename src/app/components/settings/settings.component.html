@@ -1,12 +1,10 @@
-<p>settings works!</p>
-
 <div class="container">
   <div class="row justify-content-center">
     <h2>Settings</h2>
   </div>
   <div class="row justify-content-center">
     <form [formGroup]="settingsForm">
-      <div class="input-group apikey-input mb-3">
+      <div *ngIf="!apiKey" class="input-group apikey-input mb-3">
         <label class="label">NewsAPI.org</label>
         <input
           type="text"
@@ -14,6 +12,12 @@
           formControlName="apiKey"
         />
         <div class="help-text">Please enter the API key from newsapi.org</div>
+      </div>
+
+      <div *ngIf="apiKey">
+        <div class="api-key container mt-3 mb-3">
+          API Key : **** **** **** ****
+        </div>
       </div>
 
       <div class="row justify-content-between">
