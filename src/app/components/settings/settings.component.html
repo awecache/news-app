@@ -26,7 +26,7 @@
             type="button"
             class="btn btn-danger"
             (click)="onDelete()"
-            [disabled]="false"
+            [disabled]="!apiKey"
           >
             Delete
           </button>
@@ -36,7 +36,7 @@
           type="button"
           class="btn btn-primary"
           (click)="onAdd()"
-          [disabled]="settingsForm.invalid"
+          [disabled]="settingsForm.invalid || apiKey"
         >
           Add
         </button>

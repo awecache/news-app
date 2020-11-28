@@ -5,14 +5,17 @@
 <ng-container *ngIf="articles?.length">
   <ul class="list-group">
     <li class="list-group-item" *ngFor="let article of articles">
+      <button type="button" (click)="saveArticle(article)"></button>
       <img
         src="{{ article.imageUrl }}"
         alt=""
         class="img-thumbnail rounded float-left"
       />
-      {{ article.author }}
+      <h3>
+        {{ article.title }}
+      </h3>
+      <h5>{{ article.author }}</h5>
 
-      {{ article.title }}
       {{ article.content }}
       {{ article.publishDateTime }}
       <a href="{{ article.url }}"> {{ article.url }}</a>

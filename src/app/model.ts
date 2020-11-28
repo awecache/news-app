@@ -24,3 +24,8 @@ export interface ArticlesByCountry {
   cachedTimestamp: number;
   articles: NewsArticle[];
 }
+
+export interface SavedArticles {
+  countryCode: string;
+  articles: NewsArticle[];
+}

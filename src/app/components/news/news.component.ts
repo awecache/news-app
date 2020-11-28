@@ -38,86 +38,132 @@ export class NewsComponent implements OnInit {
       }
     });
 
-    // this.countryName = this.ap;
     this.appDB.getCountryByCode(this.countryCode).then((res) => {
       this.countryName = res?.countryName ?? '';
     });
 
     this.appDB
-      .getNewsByCountryCode(this.countryCode)
+      .getArticlesByCountry(this.countryCode)
       .then((articlesByCountry) => {
-        if (!this.countryCode) {
-          this.router.navigate(['/countries']);
-          return;
+        if (!articlesByCountry) {
+          return this.apis
+            .fetchArticles(this.countryCode!)
+            .then(({ articles }) => {
+              const newsArticles = articles.map((article: any) => {
+                const {
+                  source,
+                  author,
+                  title,
+                  description,
+                  url,
+                  urlToImage,
+                  publishedAt,
+                  content,
+                } = article;
+
+                return {
+                  author,
+                  title,
+                  description,
+                  content,
+                  url,
+                  sourceName: source.name as string,
+                  imageUrl: urlToImage,
+                  publishDateTime: publishedAt,
+                };
+              });
+
+              this.cacheArticles(newsArticles, this.countryCode!);
+
+              return newsArticles;
+            });
         }
 
         const millis = Date.now() - (articlesByCountry?.cachedTimestamp || 0);
         const minLapsed = Math.floor(millis / 1000) / 60;
+        const minBefExpir = 5;
+        const isCacheExpired = minLapsed > minBefExpir;
 
-        const isCacheExpired = minLapsed > 5;
-        if (!articlesByCountry || isCacheExpired) {
-          if (articlesByCountry) {
-            this.appDB.deleteCachedArticles(this.countryCode);
-          }
+        if (isCacheExpired) {
+          this.appDB.deleteCachedArticles(this.countryCode!);
+          return this.apis
+            .fetchArticles(this.countryCode!)
+            .then(({ articles }) => {
+              const newsArticles = articles.map((article: any) => {
+                const {
+                  source,
+                  author,
+                  title,
+                  description,
+                  url,
+                  urlToImage,
+                  publishedAt,
+                  content,
+                } = article;
 
-          this.apis
-            .fetchArticles(this.countryCode)
-            .then((res) => {
-              const articles: NewsArticle[] = res.articles.map(
-                (article: any) => {
-                  const {
-                    source,
-                    author,
-                    title,
-                    description,
-                    url,
-                    urlToImage,
-                    publishedAt,
-                    content,
-                  } = article;
+                return {
+                  author,
+                  title,
+                  description,
+                  content,
+                  url,
+                  sourceName: source.name as string,
+                  imageUrl: urlToImage,
+                  publishDateTime: publishedAt,
+                };
+              });
 
-                  return {
-                    author,
-                    title,
-                    description,
-                    content,
-                    url,
-                    sourceName: source.name as string,
-                    imageUrl: urlToImage,
-                    publishDateTime: publishedAt,
-                  };
-                }
-              );
+              this.cacheArticles(newsArticles, this.countryCode!);
 
-              const articlesByCountry = {
-                articles,
-                countryCode: this.countryCode || '',
-                cachedTimestamp: Date.now(),
-              };
-
-              this.appDB.cacheArticlesByCountry(articlesByCountry);
-            })
-            .then(() => {
-              if (this.countryCode) {
-                this.appDB
-                  .getNewsByCountryCode(this.countryCode)
-                  .then((res) => {
-                    console.log(res);
-                  });
-              }
+              return newsArticles;
             });
         }
-        this.appDB.getNewsByCountryCode(this.countryCode).then((res) => {
-          this.articles = res?.articles || [];
-        });
-      });
 
-    this.appDB
-      .getSavedArticlesByCountry(this.countryCode)
-      .then((articlesByCountry) => {
-        if (articlesByCountry?.articles.length) {
-          this.articles = [...this.articles, ...articlesByCountry.articles];
-        }
+        return articlesByCountry.articles;
+      })
+      .then((newsArticles: NewsArticle[]) => {
+        let mergedArticles: NewsArticle[] = [];
+        return this.appDB
+          .getSavedArticlesByCountry(this.countryCode!)
+          .then((savedArticles) => {
+            if (savedArticles) {
+              mergedArticles = [...savedArticles.articles];
+
+              newsArticles.forEach((article: NewsArticle) => {
+                const isDuplicate = !!savedArticles.articles.find((el) => {
+                  return el.title === article.title && el.url === article.url;
+                });
+                if (!isDuplicate) {
+                  mergedArticles.push(article);
+                }
+              });
+            } else {
+              mergedArticles = [...newsArticles];
+            }
+            return mergedArticles;
+          });
+      })
+      .then((mergedArticles) => {
+        this.articles = mergedArticles;
       });
+  }
+
+  cacheArticles = (articles: NewsArticle[], countryCode: string) => {
+    const articlesByCountry = {
+      articles,
+      countryCode,
+      cachedTimestamp: Date.now(),
+    };
+
+    this.appDB.cacheArticlesByCountry(articlesByCountry);
+  };
+
+  saveArticle(article: NewsArticle) {
+    const countryCode = this.countryCode;
+    if (!countryCode) {
+      console.log('missing country code');
+      return;
+    }
+    this.appDB.saveArticleByCountry(countryCode, article);
   }
 }

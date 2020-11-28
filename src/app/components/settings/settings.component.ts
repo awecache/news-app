@@ -13,7 +13,7 @@ export class SettingsComponent implements OnInit {
   settingsForm: FormGroup = this.fb.group({
     apiKey: ['', [Validators.required]],
   });
-  apiKey?: ApiKey;
+  apiKey?: string;
 
   constructor(
     private fb: FormBuilder,
@@ -23,26 +23,28 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.appDB.getKey().then((key) => {
-      console.log(key);
-      this.apiKey = key[0];
+      this.apiKey = key[0]?.key;
     });
   }
 
   goBack() {
-    console.log('back');
     this.settingsForm.setValue({ apiKey: '' });
     this.router.navigate(['/countries']);
   }
 
-  onDelete() {
-    this.appDB.deleteKey();
+  async onDelete() {
+    await this.appDB.deleteKey();
+    const keys = await this.appDB.getKey();
+    this.apiKey = !keys.length ? '' : keys[0].key;
   }
 
-  onAdd() {
+  async onAdd() {
     const key = this.settingsForm.get('apiKey')?.value;
     if (key) {
       this.appDB.addKey({ key });
       this.settingsForm.setValue({ apiKey: '' });
     }
+    const keys = await this.appDB.getKey();
+    this.apiKey = !keys.length ? '' : keys[0].key;
   }
 }

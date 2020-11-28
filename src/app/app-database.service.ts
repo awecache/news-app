@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
 import Dexie from 'dexie';
-import { ApiKey, ArticlesByCountry, Country, NewsArticle } from './model';
+import {
+  ApiKey,
+  ArticlesByCountry,
+  Country,
+  NewsArticle,
+  SavedArticles,
+} from './model';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +15,7 @@ export class AppDatabaseService extends Dexie {
   private apiKey: Dexie.Table<ApiKey, number>;
   private countryList: Dexie.Table<Country, string>;
   private news: Dexie.Table<ArticlesByCountry, string>;
-  private savedNews: Dexie.Table<ArticlesByCountry, string>;
+  private savedNews: Dexie.Table<SavedArticles, string>;
 
   constructor() {
     super('appdb');
@@ -57,14 +63,14 @@ export class AppDatabaseService extends Dexie {
     this.countryList.add(country);
   }
 
-  getNewsByCountryCode(
+  getArticlesByCountry(
     countryCode: string
   ): Promise<ArticlesByCountry | undefined> {
     return this.news.get(countryCode);
   }
 
   cacheArticlesByCountry(articlesByCountry: ArticlesByCountry): void {
-    this.news.add(articlesByCountry);
+    this.news.put(articlesByCountry);
   }
 
   deleteCachedArticles(countryCode: string) {
@@ -73,9 +79,30 @@ export class AppDatabaseService extends Dexie {
 
   getSavedArticlesByCountry(
     countryCode: string
-  ): Promise<ArticlesByCountry | undefined> {
+  ): Promise<SavedArticles | undefined> {
     return this.savedNews.get(countryCode);
   }
 
-  saveArticleByCountry(countryCode: string, article: NewsArticle) {}
+  saveArticleByCountry(countryCode: string, savedArticle: NewsArticle) {
+    this.getSavedArticlesByCountry(countryCode).then((savedArticlesObj) => {
+      if (!savedArticlesObj) {
+        const savedArticles: SavedArticles = {
+          countryCode: countryCode,
+          articles: [savedArticle],
+        };
+        this.savedNews.add(savedArticles);
+        return;
+      }
+
+      const isDuplicate = !!savedArticlesObj.articles.find(
+        (art) =>
+          art.title === savedArticle.title && art.url === savedArticle.url
+      );
+      if (!isDuplicate) {
+        const updatedSaveArticlesObj = { ...savedArticlesObj };
+        updatedSaveArticlesObj.articles.push(savedArticle);
+        this.savedNews.put(updatedSaveArticlesObj);
+      }
+    });
+  }
 }
